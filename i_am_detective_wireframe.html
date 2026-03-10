@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Am Detective — MVP Wireframe</title>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --bg2: #13131a;
+    --bg3: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #c8a84b;
+    --accent2: #7b5ea7;
+    --red: #c0392b;
+    --green: #27ae60;
+    --blue: #2980b9;
+    --text: #e2e2e8;
+    --muted: #6b6b85;
+    --badge-open: #1a3a1a;
+    --badge-open-text: #4ade80;
+    --badge-closed: #3a1a1a;
+    --badge-closed-text: #f87171;
+    --badge-appealed: #1a2a3a;
+    --badge-appealed-text: #60a5fa;
+    --font: 'Courier New', 'Consolas', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 52px; position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 15px; font-weight: bold; letter-spacing: 1px; }
+  .nav-logo span { font-size: 20px; }
+  .nav-links { display: flex; gap: 6px; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; padding: 6px 14px;
+    border-radius: 4px; font-size: 12px; letter-spacing: 0.5px;
+    transition: all 0.2s;
+  }
+  .nav-links a.active { color: var(--accent); background: rgba(200,168,75,0.1); border: 1px solid rgba(200,168,75,0.3); }
+  .nav-links a:hover:not(.active) { color: var(--text); background: var(--bg3); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent2); display: flex; align-items: center; justify-content: center; font-size: 12px; border: 1px solid var(--border); }
+
+  /* ── PAGE SYSTEM ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── PAGE NAV BUTTONS ── */
+  .page-nav {
+    position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    display: flex; gap: 8px; flex-direction: column; align-items: flex-end;
+  }
+  .page-nav button {
+    background: var(--accent); color: #000; border: none; padding: 8px 16px;
+    border-radius: 4px; cursor: pointer; font-family: var(--font); font-size: 11px;
+    font-weight: bold; letter-spacing: 1px;
+  }
+  .page-nav button:hover { background: #e0bc55; }
+  .page-nav .page-indicator { color: var(--muted); font-size: 10px; text-align: right; letter-spacing: 1px; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px;
+    font-weight: bold; letter-spacing: 0.5px; border: 1px solid;
+  }
+  .badge-open { background: var(--badge-open); color: var(--badge-open-text); border-color: #27ae6055; }
+  .badge-closed { background: var(--badge-closed); color: var(--badge-closed-text); border-color: #c0392b55; }
+  .badge-appealed { background: var(--badge-appealed); color: var(--badge-appealed-text); border-color: #2980b955; }
+  .badge-homicide { background: #3a1020; color: #f87171; border-color: #c0392b55; }
+  .badge-fraud { background: #1a2a3a; color: #60a5fa; border-color: #2980b955; }
+  .badge-cyber { background: #1a1a3a; color: #a78bfa; border-color: #7c3aed55; }
+  .badge-uk { background: #1a2a1a; color: #86efac; border-color: #22c55e55; }
+  .badge-us { background: #1a1a2a; color: #93c5fd; border-color: #3b82f655; }
+
+  /* ════════════════════════════════════════════
+     PAGE 1 — DASHBOARD
+  ════════════════════════════════════════════ */
+  .dashboard-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 52px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 20px 16px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .sidebar-section-title { color: var(--muted); font-size: 10px; letter-spacing: 1.5px; margin-bottom: 8px; text-transform: uppercase; }
+  .filter-group { display: flex; flex-direction: column; gap: 6px; }
+  .filter-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px; border-radius: 4px; cursor: pointer; border: 1px solid transparent;
+    color: var(--muted); font-size: 12px;
+  }
+  .filter-item:hover, .filter-item.active { background: var(--bg3); border-color: var(--border); color: var(--text); }
+  .filter-item.active { color: var(--accent); border-color: rgba(200,168,75,0.3); }
+  .filter-count { font-size: 10px; color: var(--muted); background: var(--bg); padding: 1px 6px; border-radius: 10px; }
+  .search-box {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 10px; border-radius: 4px;
+    font-family: var(--font); font-size: 12px; outline: none;
+  }
+  .search-box::placeholder { color: var(--muted); }
+  .search-box:focus { border-color: var(--accent); }
+  .date-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); padding: 6px 8px; border-radius: 4px;
+    font-family: var(--font); font-size: 11px; margin-bottom: 4px; outline: none;
+  }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .stat-val { color: var(--accent); font-size: 14px; font-weight: bold; }
+  .stat-label { color: var(--muted); font-size: 10px; }
+
+  /* Main content */
+  .main-content { padding: 24px; background: var(--bg); }
+  .content-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .content-title { font-size: 16px; color: var(--text); }
+  .content-title span { color: var(--muted); font-size: 12px; margin-left: 8px; }
+  .sort-bar { display: flex; gap: 6px; align-items: center; }
+  .sort-btn {
+    background: var(--bg2); border: 1px solid var(--border); color: var(--muted);
+    padding: 5px 12px; border-radius: 4px; font-family: var(--font); font-size: 11px;
+    cursor: pointer; letter-spacing: 0.5px;
+  }
+  .sort-btn.active { color: var(--accent); border-color: rgba(200,168,75,0.4); background: rgba(200,168,75,0.08); }
+
+  /* Case card grid */
+  .case-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .case-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .case-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .case-card:hover { border-color: var(--accent); box-shadow: 0 0 12px rgba(200,168,75,0.1); }
+  .case-card:hover::before { opacity: 1; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .card-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+  .card-title { font-size: 13px; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+  .card-court { color: var(--muted); font-size: 11px; margin-bottom: 10px; }
+  .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); }
+  .card-date { color: var(--muted); font-size: 10px; }
+  .card-views { color: var(--muted); font-size: 10px; display: flex; align-items: center; gap: 4px; }
+  .case-card.featured { border-color: rgba(200,168,75,0.4); background: linear-gradient(135deg, var(--bg2), #1a1a22); }
+
+  /* Pagination */
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 28px; }
+  .pg-btn {
+    background: var(--bg2); border: 1px solid var(--border); color: var(--muted);
+    width: 32px; height: 32px; border-radius: 4px; font-family: var(--font);
+    font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .pg-btn.active { background: rgba(200,168,75,0.15); border-color: var(--accent); color: var(--accent); }
+
+  /* ════════════════════════════════════════════
+     PAGE 2 — CASE DOSSIER
+  ════════════════════════════════════════════ */
+  .dossier-header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+  }
+  .dossier-breadcrumb { color: var(--muted); font-size: 11px; margin-bottom: 10px; }
+  .dossier-breadcrumb span { color: var(--accent); cursor: pointer; }
+  .dossier-title-row { display: flex; align-items: flex-start; justify-content: space-between; }
+  .dossier-title { font-size: 20px; color: var(--text); line-height: 1.3; margin-bottom: 8px; }
+  .dossier-meta { display: flex; gap: 16px; color: var(--muted); font-size: 11px; }
+  .dossier-meta b { color: var(--text); }
+  .dossier-actions { display: flex; gap: 8px; }
+  .action-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--muted);
+    padding: 8px 14px; border-radius: 4px; font-family: var(--font); font-size: 11px;
+    cursor: pointer; letter-spacing: 0.5px;
+  }
+  .action-btn.primary { background: rgba(200,168,75,0.15); border-color: var(--accent); color: var(--accent); }
+
+  /* Tabs */
+  .dossier-tabs {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; gap: 0;
+  }
+  .tab-btn {
+    padding: 12px 18px; color: var(--muted); font-family: var(--font); font-size: 12px;
+    background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent;
+    letter-spacing: 0.5px; position: relative;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  /* Dossier content */
+  .dossier-body { padding: 28px 32px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Summary tab */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .summary-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .summary-card-title { color: var(--muted); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+  .summary-text { color: var(--text); font-size: 12px; line-height: 1.8; }
+  .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .info-label { color: var(--muted); }
+  .info-value { color: var(--text); }
+
+  /* People tab */
+  .people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .person-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 14px; text-align: center; cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .person-card:hover { border-color: var(--accent); }
+  .person-avatar {
+    width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; border: 1px solid var(--border);
+  }
+  .person-name { font-size: 12px; color: var(--text); margin-bottom: 4px; }
+  .person-role { font-size: 10px; color: var(--muted); }
+  .avatar-suspect { background: #2a1010; }
+  .avatar-victim { background: #102010; }
+  .avatar-judge { background: #10102a; }
+  .avatar-attorney { background: #1a1a2a; }
+  .avatar-witness { background: #2a2010; }
+
+  /* Timeline tab */
+  .timeline { position: relative; padding-left: 30px; }
+  .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .timeline-item { position: relative; margin-bottom: 20px; }
+  .timeline-dot {
+    position: absolute; left: -25px; top: 4px;
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid var(--bg2); z-index: 1;
+  }
+  .dot-filing { background: var(--blue); }
+  .dot-hearing { background: var(--accent); }
+  .dot-ruling { background: var(--accent2); }
+  .dot-arrest { background: var(--red); }
+  .dot-sentencing { background: var(--green); }
+  .tl-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .tl-date { color: var(--muted); font-size: 10px; margin-bottom: 4px; }
+  .tl-event { color: var(--text); font-size: 12px; font-weight: bold; margin-bottom: 4px; }
+  .tl-desc { color: var(--muted); font-size: 11px; line-height: 1.5; }
+  .tl-type-badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 9px; margin-left: 6px; }
+
+  /* Evidence tab */
+  .evidence-list { display: flex; flex-direction: column; gap: 10px; }
+  .evidence-item {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 12px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+  }
+  .evidence-item:hover { border-color: var(--accent); }
+  .evidence-icon { font-size: 20px; }
+  .evidence-name { color: var(--text); font-size: 12px; margin-bottom: 2px; }
+  .evidence-meta { color: var(--muted); font-size: 10px; }
+  .evidence-actions { margin-left: auto; display: flex; gap: 6px; }
+  .ev-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--muted);
+    padding: 4px 10px; border-radius: 3px; font-family: var(--font); font-size: 10px; cursor: pointer;
+  }
+
+  /* Graph tab */
+  .graph-container {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 20px; position: relative; overflow: hidden;
+  }
+  .graph-toolbar {
+    display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+  }
+  .graph-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--muted);
+    padding: 5px 12px; border-radius: 4px; font-family: var(--font); font-size: 11px; cursor: pointer;
+  }
+  .graph-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,168,75,0.08); }
+  .graph-area {
+    height: 400px; background: var(--bg); border-radius: 4px; position: relative;
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  /* ASCII graph nodes */
+  .g-node {
+    position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; text-align: center; font-family: var(--font);
+    border: 2px solid; cursor: pointer; transition: transform 0.2s;
+    line-height: 1.2;
+  }
+  .g-node:hover { transform: scale(1.1); z-index: 10; }
+  .g-person { background: #1a1230; border-color: #7b5ea7; color: #c4b5fd; width: 64px; height: 64px; }
+  .g-org { background: #0f2030; border-color: #2980b9; color: #93c5fd; width: 56px; height: 56px; border-radius: 6px; }
+  .g-charge { background: #2a0f0f; border-color: #c0392b; color: #fca5a5; width: 52px; height: 52px; border-radius: 4px; }
+  .g-location { background: #0f2a10; border-color: #27ae60; color: #86efac; width: 52px; height: 52px; border-radius: 20px 4px 20px 4px; }
+  .g-center { background: #2a200a; border-color: var(--accent); color: var(--accent); width: 72px; height: 72px; border: 2px solid var(--accent); font-size: 9px; }
+  svg.graph-edges { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  .graph-legend { display: flex; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Notes tab */
+  .notes-layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; }
+  .notes-editor {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  }
+  .notes-toolbar { padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; }
+  .notes-tool-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--muted);
+    width: 28px; height: 28px; border-radius: 3px; font-family: var(--font); font-size: 12px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .notes-textarea {
+    width: 100%; height: 220px; background: transparent; border: none;
+    color: var(--text); padding: 14px; font-family: var(--font); font-size: 12px;
+    resize: none; outline: none; line-height: 1.8;
+  }
+  .tags-input {
+    padding: 8px 12px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 6px;
+  }
+  .tag-chip {
+    background: rgba(123,94,167,0.2); border: 1px solid rgba(123,94,167,0.4); color: #c4b5fd;
+    padding: 2px 8px; border-radius: 12px; font-size: 10px;
+  }
+  .save-btn {
+    margin: 10px 12px; background: rgba(200,168,75,0.15); border: 1px solid var(--accent);
+    color: var(--accent); padding: 8px 16px; border-radius: 4px; font-family: var(--font);
+    font-size: 11px; cursor: pointer; width: calc(100% - 24px); letter-spacing: 1px;
+  }
+  .notes-sidebar { display: flex; flex-direction: column; gap: 12px; }
+  .existing-note { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+  .note-header { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; margin-bottom: 6px; }
+  .note-text { color: var(--text); font-size: 11px; line-height: 1.6; }
+  .note-tags { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+
+  /* ════════════════════════════════════════════
+     PAGE 3 — ARCHITECTURE + ONBOARDING
+  ════════════════════════════════════════════ */
+  .page3-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: calc(100vh - 52px); }
+  .arch-panel { padding: 32px; border-right: 1px solid var(--border); }
+  .onboard-panel { padding: 32px; background: var(--bg2); }
+  .section-heading { font-size: 13px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+  /* ASCII Architecture */
+  .arch-box {
+    border: 1px solid var(--border); border-radius: 6px; background: var(--bg2);
+    padding: 12px 16px; margin-bottom: 10px; position: relative;
+  }
+  .arch-box.highlight { border-color: var(--accent); background: rgba(200,168,75,0.05); }
+  .arch-box.blue { border-color: #2980b9; background: rgba(41,128,185,0.05); }
+  .arch-box.purple { border-color: #7b5ea7; background: rgba(123,94,167,0.05); }
+  .arch-box.red { border-color: var(--red); background: rgba(192,57,43,0.05); }
+  .arch-box.green { border-color: var(--green); background: rgba(39,174,96,0.05); }
+  .arch-label { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .arch-title { font-size: 12px; color: var(--text); }
+  .arch-subtitle { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .arch-arrow { text-align: center; color: var(--muted); font-size: 14px; margin: 4px 0; }
+  .arch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .arch-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .arch-connector {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 11px; margin: 2px 0;
+  }
+  .arch-flow-label { font-size: 9px; color: var(--muted); text-align: center; }
+
+  /* Milestone tracker */
+  .milestone-list { display: flex; flex-direction: column; gap: 12px; }
+  .milestone-item { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .milestone-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .milestone-title { font-size: 12px; color: var(--text); }
+  .milestone-week { font-size: 10px; color: var(--muted); }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+  .pf-green { background: var(--green); }
+  .pf-yellow { background: var(--accent); }
+  .pf-orange { background: #e67e22; }
+  .pf-red { background: var(--red); }
+  .pf-purple { background: var(--accent2); }
+  .milestone-tasks { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .task-chip {
+    background: var(--bg2); border: 1px solid var(--border); color: var(--muted);
+    padding: 2px 8px; border-radius: 3px; font-size: 10px;
+  }
+
+  /* Onboarding flow */
+  .onboard-flow {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 24px; margin-bottom: 20px; text-align: center;
+  }
+  .onboard-logo { font-size: 36px; margin-bottom: 8px; }
+  .onboard-title { font-size: 16px; color: var(--text); margin-bottom: 6px; }
+  .onboard-subtitle { color: var(--muted); font-size: 11px; margin-bottom: 20px; line-height: 1.6; }
+  .oauth-btn {
+    width: 100%; padding: 10px; border-radius: 4px; font-family: var(--font);
+    font-size: 12px; cursor: pointer; margin-bottom: 8px; border: 1px solid;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: 0.5px;
+  }
+  .oauth-google { background: rgba(66,133,244,0.1); border-color: #4285f4; color: #4285f4; }
+  .oauth-github { background: rgba(200,200,200,0.05); border-color: var(--border); color: var(--text); }
+  .divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 10px; margin: 12px 0; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* API status */
+  .api-status-list { display: flex; flex-direction: column; gap: 8px; }
+  .api-item { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+  .api-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .api-dot.online { background: var(--green); box-shadow: 0 0 6px rgba(39,174,96,0.5); }
+  .api-dot.limited { background: var(--accent); box-shadow: 0 0 6px rgba(200,168,75,0.5); }
+  .api-name { color: var(--text); font-size: 12px; }
+  .api-limit { color: var(--muted); font-size: 10px; margin-left: auto; }
+
+  /* Toast */
+  .toast {
+    position: fixed; top: 70px; right: 24px; background: var(--bg3);
+    border: 1px solid var(--accent); color: var(--accent);
+    padding: 10px 16px; border-radius: 6px; font-size: 11px; z-index: 300;
+    letter-spacing: 0.5px;
+  }
+
+  /* Tooltip tour */
+  .tooltip-bubble {
+    position: absolute; background: var(--bg3); border: 1px solid var(--accent);
+    color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 11px;
+    max-width: 200px; z-index: 50; line-height: 1.5;
+  }
+  .tooltip-bubble::before {
+    content: '◀'; position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
+    color: var(--accent); font-size: 12px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     GLOBAL NAV
+══════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-logo">
+    <span>🕵️</span> I AM DETECTIVE
+  </div>
+  <div class="nav-links">
+    <a href="#" class="active" onclick="showPage(0,this)">DASHBOARD</a>
+    <a href="#" onclick="showPage(1,this)">DOSSIER</a>
+    <a href="#" onclick="showPage(2,this)">ARCHITECTURE</a>
+  </div>
+  <div class="nav-right">
+    <span style="color:var(--muted);font-size:11px">Vikram S.</span>
+    <div class="avatar">VS</div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 1 — DASHBOARD
+══════════════════════════════════════════════ -->
+<div class="page active" id="page-0">
+<div class="dashboard-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <!-- Search -->
+    <div>
+      <div class="sidebar-section-title">⌕ SEARCH CASES</div>
+      <input class="search-box" type="text" placeholder="e.g. United States v. ..." value="">
+    </div>
+
+    <!-- Stats -->
+    <div>
+      <div class="sidebar-section-title">▸ CORPUS STATS</div>
+      <div class="stat-row"><span class="stat-label">Total Cases</span><span class="stat-val">14,832</span></div>
+      <div class="stat-row"><span class="stat-label">US Cases</span><span class="stat-val">11,204</span></div>
+      <div class="stat-row"><span class="stat-label">UK Cases</span><span class="stat-val">3,628</span></div>
+      <div class="stat-row" style="border:none"><span class="stat-label">Last Sync</span><span style="color:var(--green);font-size:11px">2h ago</span></div>
+    </div>
+
+    <!-- Source -->
+    <div>
+      <div class="sidebar-section-title">▸ SOURCE</div>
+      <div class="filter-group">
+        <div class="filter-item active">🇺🇸 CourtListener <span class="filter-count">11.2k</span></div>
+        <div class="filter-item">🇬🇧 UK Archives <span class="filter-count">3.6k</span></div>
+        <div class="filter-item">📊 FBI Data <span class="filter-count">stats</span></div>
+      </div>
+    </div>
+
+    <!-- Crime Type -->
+    <div>
+      <div class="sidebar-section-title">▸ CRIME TYPE</div>
+      <div class="filter-group">
+        <div class="filter-item">🔴 Homicide <span class="filter-count">1,832</span></div>
+        <div class="filter-item active">💙 Financial Fraud <span class="filter-count">4,201</span></div>
+        <div class="filter-item">🟣 Cybercrime <span class="filter-count">2,109</span></div>
+        <div class="filter-item">⚪ Drug Trafficking <span class="filter-count">3,440</span></div>
+        <div class="filter-item">🟡 Corruption <span class="filter-count">1,250</span></div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div>
+      <div class="sidebar-section-title">▸ STATUS</div>
+      <div class="filter-group">
+        <div class="filter-item">🟢 Open <span class="filter-count">2,341</span></div>
+        <div class="filter-item">🔴 Closed <span class="filter-count">10,891</span></div>
+        <div class="filter-item">🔵 Appealed <span class="filter-count">1,600</span></div>
+      </div>
+    </div>
+
+    <!-- Date Range -->
+    <div>
+      <div class="sidebar-section-title">▸ DATE RANGE</div>
+      <input class="date-input" type="text" placeholder="From: 2000-01-01">
+      <input class="date-input" type="text" placeholder="To: 2024-12-31">
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="content-header">
+      <div class="content-title">
+        Financial Fraud Cases
+        <span>4,201 results</span>
+      </div>
+      <div class="sort-bar">
+        <span style="color:var(--muted);font-size:11px">SORT:</span>
+        <button class="sort-btn active">RELEVANCE</button>
+        <button class="sort-btn">DATE FILED</button>
+        <button class="sort-btn">MOST VIEWED</button>
+      </div>
+    </div>
+
+    <!-- CASE CARDS GRID -->
+    <div class="case-grid">
+
+      <!-- Card 1 — Featured -->
+      <div class="case-card featured" onclick="showPage(1)">
+        <div class="card-top">
+          <div class="card-badges">
+            <span class="badge badge-open">OPEN</span>
+            <span class="badge badge-fraud">FRAUD</span>
+            <span class="badge badge-us">US</span>
+          </div>
+          <span style="color:var(--accent);font-size:11px">★ FEATURED</span>
+        </div>
+        <div class="card-title">United States v. Bankman-Fried<br><span style="color:var(--muted);font-size:11px">FTX Cryptocurrency Exchange Fraud</span></div>
+        <div class="card-court">SDNY · Case No. 22-cr-00673</div>
+        <div class="card-footer">
+          <span class="card-date">Filed: DEC 12, 2022</span>
+          <span class="card-views">👁 12,841 views</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="case-card">
+        <div class="card-top">
+          <div class="card-badges">
+            <span class="badge badge-closed">CLOSED</span>
+            <span class="badge badge-fraud">FRAUD</span>
+            <span class="badge badge-us">US</span>
+          </div>
+        </div>
+        <div class="card-title">SEC v. Theranos Inc., Elizabeth Holmes</div>
+        <div class="card-court">N.D. California · Case No. 18-cr-00258</div>
+        <div class="card-footer">
+          <span class="card-date">Filed: JUN 15, 2018</span>
+          <span class="card-views">👁 9,204 views</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="case-card">
+        <div class="card-top">
+          <div class="card-badges">
+            <span class="badge badge-appealed">APPEALED</span>
+            <span class="badge badge-fraud">FRAUD</span>
+            <span class="badge badge-uk">UK</span>
+          </div>
+        </div>
+        <div class="card-title">R v. Barclays Bank, Jes Staley</div>
+        <div class="card-court">Crown Court London · Case XC-2019-0042</div>
+        <div class="card-footer">
+          <span class="card-date">Filed: FEB 03, 2019</span>
+          <span class="card-views">👁 6,103 views</span>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="case-card">
+        <div class="card-top">
+          <div class="card-badges">
+            <span class="badge badge-closed">CLOSED</span>
+            <span class="badge badge-cyber">CYBER</span>
+            <span class="badge badge-us">US</span>
+          </div>
+        </div>
+        <div class="card-title">United States v. Roman Seleznev</div>
+        <div class="card-court">W.D. Washington · Case No. 11-cr-00070</div>
+        <div class="card-footer">
+          <span class="card-date">Filed: MAR 21, 2011</span>
+          <span class="card-views">👁 4,887 views</span>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="case-card">
+        <div class="card-top">
+          <div class="card-badges">
+            <span class="badge badge-open">OPEN</span>
+            <span class="badge badge-fraud">FRAUD</span>
+            <span class="badge badge-us">US</span>
+          </div>
+        </div>
+        <div class="card-title">United States v. Kwon Do Hyeong<br><span style="color:var(--muted);font-size:11px">Terra / LUNA Collapse</span></div>
+        <div class="card-court">SDNY · Case No. 22-cr-00673-2</div>
+        <div class="card-footer">
+          <span class="card-date">Filed: MAR 23, 2023</span>
+          <span class="card-views">👁 3,991 views</span>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="case-card">
+        <div class="card-top">
+          <div class="card-badges">
+            <span class="badge badge-closed">CLOSED</span>
+            <span class="badge badge-fraud">FRAUD</span>
+            <span class="badge badge-uk">UK</span>
+          </div>
+        </div>
+        <div class="card-title">R v. Nick Leeson<br><span style="color:var(--muted);font-size:11px">Barings Bank Collapse</span></div>
+        <div class="card-court">Singapore High Court · 1995</div>
+        <div class="card-footer">
+          <span class="card-date">Filed: JAN 26, 1995</span>
+          <span class="card-views">👁 7,210 views</span>
+        </div>
+      </div>
+
+    </div><!-- /case-grid -->
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+      <button class="pg-btn">‹</button>
+      <button class="pg-btn active">1</button>
+      <button class="pg-btn">2</button>
+      <button class="pg-btn">3</button>
+      <span style="color:var(--muted);font-size:12px">…</span>
+      <button class="pg-btn">701</button>
+      <button class="pg-btn">›</button>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 2 — CASE DOSSIER
+══════════════════════════════════════════════ -->
+<div class="page" id="page-1">
+
+  <!-- DOSSIER HEADER -->
+  <div class="dossier-header">
+    <div class="dossier-breadcrumb">
+      <span onclick="showPage(0)">DASHBOARD</span> / Cases / SDNY / 22-cr-00673
+    </div>
+    <div class="dossier-title-row">
+      <div>
+        <div class="dossier-title">United States v. Samuel Bankman-Fried</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <span class="badge badge-closed">CLOSED</span>
+          <span class="badge badge-fraud">FINANCIAL FRAUD</span>
+          <span class="badge badge-us">COURTLISTENER</span>
+        </div>
+        <div class="dossier-meta">
+          <span>Court: <b>SDNY</b></span>
+          <span>Filed: <b>DEC 12, 2022</b></span>
+          <span>Terminated: <b>NOV 02, 2023</b></span>
+          <span>Jurisdiction: <b>Federal</b></span>
+        </div>
+      </div>
+      <div class="dossier-actions">
+        <button class="action-btn">⊞ COMPARE</button>
+        <button class="action-btn">↗ EXPORT</button>
+        <button class="action-btn primary">+ ADD NOTE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="dossier-tabs">
+    <button class="tab-btn active" onclick="showTab('summary',this)">📋 SUMMARY</button>
+    <button class="tab-btn" onclick="showTab('people',this)">👥 PEOPLE</button>
+    <button class="tab-btn" onclick="showTab('timeline',this)">📅 TIMELINE</button>
+    <button class="tab-btn" onclick="showTab('evidence',this)">📁 EVIDENCE</button>
+    <button class="tab-btn" onclick="showTab('graph',this)">🕸 GRAPH</button>
+    <button class="tab-btn" onclick="showTab('notes',this)">✏️ MY NOTES</button>
+  </div>
+
+  <div class="dossier-body">
+
+    <!-- TAB: SUMMARY -->
+    <div class="tab-content active" id="tab-summary">
+      <div class="summary-grid">
+        <div class="summary-card" style="grid-column: 1 / -1;">
+          <div class="summary-card-title">▸ CASE OVERVIEW</div>
+          <div class="summary-text">
+            Samuel Bankman-Fried, founder of cryptocurrency exchange FTX, was charged with seven counts of wire fraud, securities fraud, commodities fraud, and money laundering conspiracy. Federal prosecutors alleged that Bankman-Fried secretly used billions of dollars of FTX customer funds to support his hedge fund Alameda Research, cover losses, and finance personal investments. The scheme resulted in approximately $8 billion in customer losses.
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">▸ CASE DETAILS</div>
+          <div class="info-row"><span class="info-label">Case Number</span><span class="info-value">22-cr-00673</span></div>
+          <div class="info-row"><span class="info-label">Court</span><span class="info-value">S.D.N.Y.</span></div>
+          <div class="info-row"><span class="info-label">Judge</span><span class="info-value">Hon. Lewis A. Kaplan</span></div>
+          <div class="info-row"><span class="info-label">Verdict</span><span class="info-value" style="color:var(--red)">GUILTY (All 7 counts)</span></div>
+          <div class="info-row"><span class="info-label">Sentence</span><span class="info-value">25 years federal prison</span></div>
+          <div class="info-row" style="border:none"><span class="info-label">Estimated Loss</span><span class="info-value" style="color:var(--red)">$8,000,000,000</span></div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-title">▸ CHARGES</div>
+          <div class="info-row"><span class="info-label">Count 1</span><span class="info-value">Wire Fraud (Customers)</span></div>
+          <div class="info-row"><span class="info-label">Count 2</span><span class="info-value">Wire Fraud (Lenders)</span></div>
+          <div class="info-row"><span class="info-label">Count 3</span><span class="info-value">Securities Fraud</span></div>
+          <div class="info-row"><span class="info-label">Count 4</span><span class="info-value">Commodities Fraud</span></div>
+          <div class="info-row"><span class="info-label">Count 5-6</span><span class="info-value">Money Laundering Conspiracy</span></div>
+          <div class="info-row" style="border:none"><span class="info-label">Count 7</span><span class="info-value">Campaign Finance Violations</span></div>
+        </div>
+        <div class="summary-card" style="grid-column: 1 / -1; background: rgba(200,168,75,0.04); border-color: rgba(200,168,75,0.2)">
+          <div class="summary-card-title">▸ REGIONAL CRIME CONTEXT <span style="color:var(--muted);font-weight:normal">(FBI Data — SDNY Region)</span></div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:6px">
+            <div style="text-align:center"><div style="font-size:22px;color:var(--accent)">3.2%</div><div style="color:var(--muted);font-size:10px">YoY rise in<br>financial fraud (NY)</div></div>
+            <div style="text-align:center"><div style="font-size:22px;color:var(--blue)">$12B</div><div style="color:var(--muted);font-size:10px">Total fraud losses<br>reported (2022)</div></div>
+            <div style="text-align:center"><div style="font-size:22px;color:var(--green)">67%</div><div style="color:var(--muted);font-size:10px">Federal conviction rate<br>for wire fraud</div></div>
+            <div style="text-align:center"><div style="font-size:22px;color:var(--accent2)">4.1 yrs</div><div style="color:var(--muted);font-size:10px">Avg sentence<br>(financial fraud)</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PEOPLE -->
+    <div class="tab-content" id="tab-people">
+      <div style="color:var(--muted);font-size:11px;margin-bottom:16px">7 individuals identified in case record</div>
+      <div class="people-grid">
+        <div class="person-card">
+          <div class="person-avatar avatar-suspect">🦹</div>
+          <div class="person-name">Samuel Bankman-Fried</div>
+          <div class="person-role" style="color:var(--red)">DEFENDANT</div>
+          <div style="margin-top:8px"><span class="badge badge-closed" style="font-size:9px">CONVICTED</span></div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar avatar-attorney">⚖️</div>
+          <div class="person-name">Damian Williams</div>
+          <div class="person-role">US ATTORNEY</div>
+          <div style="margin-top:8px"><span class="badge badge-us" style="font-size:9px">PROSECUTION</span></div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar avatar-judge">👨‍⚖️</div>
+          <div class="person-name">Hon. Lewis A. Kaplan</div>
+          <div class="person-role">PRESIDING JUDGE</div>
+          <div style="margin-top:8px"><span class="badge badge-appealed" style="font-size:9px">SDNY</span></div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar avatar-witness">🗣️</div>
+          <div class="person-name">Caroline Ellison</div>
+          <div class="person-role">CO-CONSPIRATOR / WITNESS</div>
+          <div style="margin-top:8px"><span class="badge badge-open" style="font-size:9px">COOPERATING</span></div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar avatar-witness">🗣️</div>
+          <div class="person-name">Gary Wang</div>
+          <div class="person-role">CO-CONSPIRATOR / WITNESS</div>
+          <div style="margin-top:8px"><span class="badge badge-open" style="font-size:9px">COOPERATING</span></div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar avatar-attorney">🧑‍💼</div>
+          <div class="person-name">Mark Cohen</div>
+          <div class="person-role">DEFENSE ATTORNEY</div>
+          <div style="margin-top:8px"><span class="badge badge-fraud" style="font-size:9px">DEFENSE</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: TIMELINE -->
+    <div class="tab-content" id="tab-timeline">
+      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+        <span style="color:var(--muted);font-size:11px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block"></span>ARREST</span>
+        <span style="color:var(--muted);font-size:11px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--blue);display:inline-block"></span>FILING</span>
+        <span style="color:var(--muted);font-size:11px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block"></span>HEARING</span>
+        <span style="color:var(--muted);font-size:11px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--accent2);display:inline-block"></span>RULING</span>
+        <span style="color:var(--muted);font-size:11px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block"></span>SENTENCING</span>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot dot-arrest"></div>
+          <div class="tl-card">
+            <div class="tl-date">DEC 12, 2022</div>
+            <div class="tl-event">Arrest in the Bahamas <span class="tl-type-badge" style="background:#3a1010;color:#f87171;border:1px solid #c0392b44">ARREST</span></div>
+            <div class="tl-desc">SBF arrested by Bahamian authorities at request of US DOJ. Extradition proceedings initiated. FTX exchange had already halted withdrawals on Nov 8, 2022.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-filing"></div>
+          <div class="tl-card">
+            <div class="tl-date">DEC 21, 2022</div>
+            <div class="tl-event">Extradition & Initial Indictment <span class="tl-type-badge" style="background:#0f2030;color:#93c5fd;border:1px solid #2980b944">FILING</span></div>
+            <div class="tl-desc">SBF extradited to the US. Indicted on 8 counts including wire fraud, securities fraud, and campaign finance violations. Released on $250M bond.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-hearing"></div>
+          <div class="tl-card">
+            <div class="tl-date">JAN 03, 2023</div>
+            <div class="tl-event">Not Guilty Plea Entered <span class="tl-type-badge" style="background:#2a200a;color:var(--accent);border:1px solid #c8a84b44">HEARING</span></div>
+            <div class="tl-desc">SBF pleaded not guilty to all counts before Judge Kaplan. Trial date set for October 2023. Co-conspirators Ellison and Wang had already pleaded guilty and agreed to cooperate.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-hearing"></div>
+          <div class="tl-card">
+            <div class="tl-date">AUG 11, 2023</div>
+            <div class="tl-event">Bond Revoked — Remanded to Custody <span class="tl-type-badge" style="background:#2a200a;color:var(--accent);border:1px solid #c8a84b44">HEARING</span></div>
+            <div class="tl-desc">Judge Kaplan revoked SBF's bail after finding he had attempted to tamper with witnesses, including sharing private diary of Caroline Ellison with media.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-ruling"></div>
+          <div class="tl-card">
+            <div class="tl-date">NOV 02, 2023</div>
+            <div class="tl-event">Verdict: Guilty on All 7 Counts <span class="tl-type-badge" style="background:#1a1a3a;color:#c4b5fd;border:1px solid #7b5ea744">RULING</span></div>
+            <div class="tl-desc">Jury returned guilty verdict on all 7 counts after deliberating for approximately 4.5 hours. Maximum potential sentence of 115 years.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-sentencing"></div>
+          <div class="tl-card">
+            <div class="tl-date">MAR 28, 2024</div>
+            <div class="tl-event">Sentencing: 25 Years Federal Prison <span class="tl-type-badge" style="background:#0a2010;color:#86efac;border:1px solid #27ae6044">SENTENCING</span></div>
+            <div class="tl-desc">Judge Kaplan sentenced SBF to 25 years in federal prison, significantly below the 40-50 years recommended by prosecutors but far above the defense's request of 5-6 years.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: EVIDENCE -->
+    <div class="tab-content" id="tab-evidence">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="color:var(--muted);font-size:11px">12 documents linked to this case</div>
+        <input class="search-box" style="width:220px" placeholder="Search documents...">
+      </div>
+      <div class="evidence-list">
+        <div class="evidence-item">
+          <span class="evidence-icon">📄</span>
+          <div>
+            <div class="evidence-name">Original Indictment — 22-cr-00673</div>
+            <div class="evidence-meta">PDF · 48 pages · Filed DEC 21, 2022 · CourtListener</div>
+          </div>
+          <div class="evidence-actions">
+            <button class="ev-btn">PREVIEW</button>
+            <button class="ev-btn">↗ OPEN</button>
+          </div>
+        </div>
+        <div class="evidence-item">
+          <span class="evidence-icon">📄</span>
+          <div>
+            <div class="evidence-name">Superseding Indictment (Second)</div>
+            <div class="evidence-meta">PDF · 63 pages · Filed FEB 23, 2023 · CourtListener</div>
+          </div>
+          <div class="evidence-actions">
+            <button class="ev-btn">PREVIEW</button>
+            <button class="ev-btn">↗ OPEN</button>
+          </div>
+        </div>
+        <div class="evidence-item">
+          <span class="evidence-icon">📊</span>
+          <div>
+            <div class="evidence-name">Caroline Ellison Cooperation Agreement</div>
+            <div class="evidence-meta">PDF · 12 pages · Filed DEC 19, 2022 · CourtListener</div>
+          </div>
+          <div class="evidence-actions">
+            <button class="ev-btn">PREVIEW</button>
+            <button class="ev-btn">↗ OPEN</button>
+          </div>
+        </div>
+        <div class="evidence-item">
+          <span class="evidence-icon">📋</span>
+          <div>
+            <div class="evidence-name">Sentencing Memorandum — Government</div>
+            <div class="evidence-meta">PDF · 39 pages · Filed MAR 15, 2024 · CourtListener</div>
+          </div>
+          <div class="evidence-actions">
+            <button class="ev-btn">PREVIEW</button>
+            <button class="ev-btn">↗ OPEN</button>
+          </div>
+        </div>
+        <div class="evidence-item">
+          <span class="evidence-icon">📋</span>
+          <div>
+            <div class="evidence-name">Defense Sentencing Memorandum</div>
+            <div class="evidence-meta">PDF · 31 pages · Filed MAR 15, 2024 · CourtListener</div>
+          </div>
+          <div class="evidence-actions">
+            <button class="ev-btn">PREVIEW</button>
+            <button class="ev-btn">↗ OPEN</button>
+          </div>
+        </div>
+        <div class="evidence-item">
+          <span class="evidence-icon">⚖️</span>
+          <div>
+            <div class="evidence-name">Final Judgment & Sentence</div>
+            <div class="evidence-meta">PDF · 8 pages · Filed MAR 28, 2024 · CourtListener</div>
+          </div>
+          <div class="evidence-actions">
+            <button class="ev-btn">PREVIEW</button>
+            <button class="ev-btn">↗ OPEN</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: GRAPH -->
+    <div class="tab-content" id="tab-graph">
+      <div class="graph-container">
+        <div class="graph-toolbar">
+          <span style="color:var(--muted);font-size:11px;margin-right:4px">FILTER:</span>
+          <button class="graph-btn active">ALL</button>
+          <button class="graph-btn">PEOPLE</button>
+          <button class="graph-btn">ORGS</button>
+          <button class="graph-btn">CHARGES</button>
+          <button class="graph-btn">LOCATIONS</button>
+          <span style="flex:1"></span>
+          <button class="graph-btn">⊕ ZOOM IN</button>
+          <button class="graph-btn">⊖ ZOOM OUT</button>
+          <button class="graph-btn">↺ RESET</button>
+        </div>
+
+        <!-- ASCII Force-Directed Graph Mockup -->
+        <div class="graph-area">
+          <svg class="graph-edges">
+            <!-- Edges from center FTX to nodes -->
+            <line x1="50%" y1="50%" x2="20%" y2="25%" stroke="#2a2a3d" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <line x1="50%" y1="50%" x2="78%" y2="20%" stroke="#2a2a3d" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <line x1="50%" y1="50%" x2="18%" y2="65%" stroke="#2a2a3d" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <line x1="50%" y1="50%" x2="80%" y2="70%" stroke="#2a2a3d" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <line x1="50%" y1="50%" x2="50%" y2="15%" stroke="#2a2a3d" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <line x1="50%" y1="50%" x2="50%" y2="82%" stroke="#2a2a3d" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <!-- SBF to Alameda -->
+            <line x1="20%" y1="25%" x2="78%" y2="20%" stroke="#7b5ea750" stroke-width="1"/>
+            <!-- SBF to Caroline -->
+            <line x1="20%" y1="25%" x2="18%" y2="65%" stroke="#7b5ea750" stroke-width="1"/>
+            <!-- edge labels -->
+            <text x="34%" y="22%" fill="#6b6b85" font-size="9" font-family="monospace">FOUNDED</text>
+            <text x="63%" y="22%" fill="#6b6b85" font-size="9" font-family="monospace">CONTROLS</text>
+            <text x="30%" y="50%" fill="#6b6b85" font-size="9" font-family="monospace">CHARGED WITH</text>
+            <text x="64%" y="65%" fill="#6b6b85" font-size="9" font-family="monospace">FILED IN</text>
+            <text x="52%" y="28%" fill="#6b6b85" font-size="9" font-family="monospace">CEO OF</text>
+            <text x="52%" y="72%" fill="#6b6b85" font-size="9" font-family="monospace">VICTIM OF</text>
+          </svg>
+
+          <!-- Center node: FTX -->
+          <div class="g-node g-org" style="left:calc(50% - 28px);top:calc(50% - 28px)">🏦<br>FTX</div>
+
+          <!-- SBF -->
+          <div class="g-node g-person" style="left:calc(20% - 32px);top:calc(25% - 32px)">🦹<br>SBF</div>
+
+          <!-- Alameda Research -->
+          <div class="g-node g-org" style="left:calc(78% - 28px);top:calc(20% - 28px)">📈<br>Alameda</div>
+
+          <!-- Caroline Ellison -->
+          <div class="g-node g-person" style="left:calc(18% - 32px);top:calc(65% - 32px)">🗣️<br>Ellison</div>
+
+          <!-- Wire Fraud charge -->
+          <div class="g-node g-charge" style="left:calc(80% - 26px);top:calc(70% - 26px)">⚠️<br>Fraud</div>
+
+          <!-- DOJ -->
+          <div class="g-node g-org" style="left:calc(50% - 28px);top:calc(15% - 28px)">⚖️<br>DOJ</div>
+
+          <!-- Customers -->
+          <div class="g-node g-person" style="left:calc(50% - 32px);top:calc(82% - 32px)">👥<br>Customers</div>
+
+          <!-- Bahamas location -->
+          <div class="g-node g-location" style="left:calc(88% - 26px);top:calc(42% - 26px)">🏝️<br>Bahamas</div>
+        </div>
+
+        <div class="graph-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#7b5ea7;border-radius:50%"></div> Person</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#2980b9;border-radius:2px"></div> Organization</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#c0392b;border-radius:2px"></div> Charge</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#27ae60;border-radius:10px 2px"></div> Location</div>
+          <span style="color:var(--muted);font-size:10px;margin-left:auto">Click any node for details → cross-case lookup</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: NOTES -->
+    <div class="tab-content" id="tab-notes">
+      <div class="notes-layout">
+        <div>
+          <div style="color:var(--muted);font-size:11px;margin-bottom:12px">NEW ANNOTATION</div>
+          <div class="notes-editor">
+            <div class="notes-toolbar">
+              <button class="notes-tool-btn"><b>B</b></button>
+              <button class="notes-tool-btn"><i>I</i></button>
+              <button class="notes-tool-btn"><u>U</u></button>
+              <button class="notes-tool-btn">H1</button>
+              <button class="notes-tool-btn">≡</button>
+              <button class="notes-tool-btn">—</button>
+              <button class="notes-tool-btn">🔗</button>
+              <span style="flex:1"></span>
+              <span style="color:var(--muted);font-size:10px;align-self:center">Rich Text</span>
+            </div>
+            <textarea class="notes-textarea" placeholder="Add your investigation notes here...
+
+Select text on any tab → click 'Add Note' to anchor annotations to specific content.
+
+Use tags to organize: #suspect #motive #timeline">
+Key observation: The ~$8B gap between FTX customer deposits and actual holdings suggests funds were being diverted to Alameda Research as early as 2019-2020, not just in the final collapse period.
+
+Caroline Ellison's testimony about SBF's "secret exemption" from Alameda's risk limits is the linchpin of the prosecution's case.
+
+Cross-reference with Celsius Network case — similar structure of commingling customer funds.</textarea>
+            <div class="tags-input">
+              <span style="color:var(--muted);font-size:10px">TAGS:</span>
+              <span class="tag-chip">#motive</span>
+              <span class="tag-chip">#alameda</span>
+              <span class="tag-chip">#cross-ref</span>
+              <span style="color:var(--muted);font-size:10px;margin-left:4px">+ add tag</span>
+            </div>
+            <button class="save-btn">💾 SAVE ANNOTATION</button>
+          </div>
+        </div>
+        <div class="notes-sidebar">
+          <div style="color:var(--muted);font-size:11px;margin-bottom:4px">SAVED NOTES (3)</div>
+          <div class="existing-note">
+            <div class="note-header">
+              <span>Mar 9, 2026</span>
+              <span>Summary Tab</span>
+            </div>
+            <div class="note-text">The $250M bail bond is misleading — most was secured by parents' property in Stanford, not liquid assets.</div>
+            <div class="note-tags">
+              <span class="tag-chip">#bail</span>
+              <span class="tag-chip">#sbn</span>
+            </div>
+          </div>
+          <div class="existing-note">
+            <div class="note-header">
+              <span>Mar 8, 2026</span>
+              <span>Timeline Tab</span>
+            </div>
+            <div class="note-text">Witness tampering (diary leak) → bail revocation is a clear pattern of obstruction. Should cross-ref with Enron's Lay.</div>
+            <div class="note-tags">
+              <span class="tag-chip">#obstruction</span>
+            </div>
+          </div>
+          <div class="existing-note">
+            <div class="note-header">
+              <span>Mar 7, 2026</span>
+              <span>People Tab</span>
+            </div>
+            <div class="note-text">Gary Wang's cooperation likely included technical architecture evidence — he built the backdoor that let Alameda borrow unlimited funds.</div>
+            <div class="note-tags">
+              <span class="tag-chip">#technical</span>
+              <span class="tag-chip">#wang</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dossier-body -->
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 3 — ARCHITECTURE & MILESTONE TRACKER
+══════════════════════════════════════════════ -->
+<div class="page" id="page-2">
+<div class="page3-layout">
+
+  <!-- LEFT: ARCHITECTURE -->
+  <div class="arch-panel">
+    <div class="section-heading">🏗 SYSTEM ARCHITECTURE</div>
+
+    <!-- Client -->
+    <div class="arch-box highlight">
+      <div class="arch-label">CLIENT</div>
+      <div class="arch-title">Next.js 14 (App Router)</div>
+      <div class="arch-subtitle">Tailwind CSS · D3.js / react-force-graph · react-chrono</div>
+    </div>
+
+    <div class="arch-arrow">▼ REST / JSON</div>
+
+    <!-- Go API -->
+    <div class="arch-box blue">
+      <div class="arch-label">BACKEND API</div>
+      <div class="arch-title">Go + Gin · ECS Fargate</div>
+      <div class="arch-subtitle">Fan-out to external APIs · JWT auth middleware · Rate limiter</div>
+    </div>
+
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-row">
+      <div class="arch-box green" style="margin:0">
+        <div class="arch-label">PRIMARY DB</div>
+        <div class="arch-title">PostgreSQL</div>
+        <div class="arch-subtitle">AWS RDS · tsvector FTS · JSONB metadata</div>
+      </div>
+      <div class="arch-box red" style="margin:0">
+        <div class="arch-label">CACHE</div>
+        <div class="arch-title">Redis</div>
+        <div class="arch-subtitle">ElastiCache · TTL layers · Session store</div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">▼ Background workers (goroutines)</div>
+
+    <div class="arch-row3">
+      <div class="arch-box" style="margin:0;text-align:center">
+        <div class="arch-label" style="font-size:8px">US CASE LAW</div>
+        <div class="arch-title" style="font-size:11px">CourtListener</div>
+        <div class="arch-subtitle">5k req/hr · 6h sync</div>
+      </div>
+      <div class="arch-box" style="margin:0;text-align:center">
+        <div class="arch-label" style="font-size:8px">US CRIME STATS</div>
+        <div class="arch-title" style="font-size:11px">FBI CDE</div>
+        <div class="arch-subtitle">Nightly batch · Public</div>
+      </div>
+      <div class="arch-box" style="margin:0;text-align:center">
+        <div class="arch-label" style="font-size:8px">UK ARCHIVES</div>
+        <div class="arch-title" style="font-size:11px">National Archives</div>
+        <div class="arch-subtitle">3k/day · On-demand</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <div class="section-heading" style="font-size:11px">🔑 REDIS CACHE LAYERS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px">
+          <div style="color:var(--accent);font-size:10px;font-family:monospace">case:{id}</div>
+          <div style="color:var(--muted);font-size:10px">TTL: 1 hour</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px">
+          <div style="color:var(--accent);font-size:10px;font-family:monospace">search:{hash}</div>
+          <div style="color:var(--muted);font-size:10px">TTL: 15 min</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px">
+          <div style="color:var(--accent);font-size:10px;font-family:monospace">graph:{case_id}</div>
+          <div style="color:var(--muted);font-size:10px">TTL: 30 min</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px">
+          <div style="color:var(--accent);font-size:10px;font-family:monospace">stats:{region}:{yr}</div>
+          <div style="color:var(--muted);font-size:10px">TTL: 24 hours</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Status -->
+    <div style="margin-top:20px">
+      <div class="section-heading" style="font-size:11px">📡 EXTERNAL API STATUS</div>
+      <div class="api-status-list">
+        <div class="api-item">
+          <div class="api-dot online"></div>
+          <div>
+            <div class="api-name">CourtListener</div>
+            <div style="color:var(--muted);font-size:10px">courtlistener.com/api/rest/v4/</div>
+          </div>
+          <div class="api-limit">5,000 req/hr · Token Auth</div>
+        </div>
+        <div class="api-item">
+          <div class="api-dot online"></div>
+          <div>
+            <div class="api-name">FBI Crime Data Explorer</div>
+            <div style="color:var(--muted);font-size:10px">api.usa.gov/crime/fbi/sapi/</div>
+          </div>
+          <div class="api-limit">Generous · API Key</div>
+        </div>
+        <div class="api-item">
+          <div class="api-dot limited"></div>
+          <div>
+            <div class="api-name">UK National Archives</div>
+            <div style="color:var(--muted);font-size:10px">discovery.nationalarchives.gov.uk/API/</div>
+          </div>
+          <div class="api-limit">3,000 req/day · Public</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: MILESTONES + ONBOARDING -->
+  <div class="onboard-panel">
+    <div class="section-heading">🗺 MILESTONE TRACKER</div>
+    <div class="milestone-list">
+
+      <div class="milestone-item">
+        <div class="milestone-header">
+          <div class="milestone-title">🟢 M1 — Foundation</div>
+          <div class="milestone-week">Week 1–2</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill pf-green" style="width:0%"></div></div>
+        <div class="milestone-tasks">
+          <span class="task-chip">Go+Gin scaffold</span>
+          <span class="task-chip">Next.js 14 setup</span>
+          <span class="task-chip">PG schema + migrations</span>
+          <span class="task-chip">Redis client</span>
+          <span class="task-chip">OAuth 2.0</span>
+          <span class="task-chip">CI/CD pipeline</span>
+        </div>
+      </div>
+
+      <div class="milestone-item">
+        <div class="milestone-header">
+          <div class="milestone-title">🟡 M2 — Data Ingestion</div>
+          <div class="milestone-week">Week 3–4</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill pf-yellow" style="width:0%"></div></div>
+        <div class="milestone-tasks">
+          <span class="task-chip">CourtListener worker</span>
+          <span class="task-chip">Party/event extraction</span>
+          <span class="task-chip">FBI nightly cron</span>
+          <span class="task-chip">UK Archives importer</span>
+          <span class="task-chip">Redis cache layer</span>
+          <span class="task-chip">Data normalization</span>
+        </div>
+      </div>
+
+      <div class="milestone-item">
+        <div class="milestone-header">
+          <div class="milestone-title">🟠 M3 — Core UI</div>
+          <div class="milestone-week">Week 5–6</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill pf-orange" style="width:0%"></div></div>
+        <div class="milestone-tasks">
+          <span class="task-chip">Cases list API</span>
+          <span class="task-chip">Case detail API</span>
+          <span class="task-chip">Dashboard UI</span>
+          <span class="task-chip">Dossier tabbed view</span>
+          <span class="task-chip">Full-text search</span>
+          <span class="task-chip">Responsive layout</span>
+        </div>
+      </div>
+
+      <div class="milestone-item">
+        <div class="milestone-header">
+          <div class="milestone-title">🔴 M4 — Interactive</div>
+          <div class="milestone-week">Week 7–8</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill pf-red" style="width:0%"></div></div>
+        <div class="milestone-tasks">
+          <span class="task-chip">Force graph</span>
+          <span class="task-chip">Graph API</span>
+          <span class="task-chip">Timeline component</span>
+          <span class="task-chip">Annotations CRUD</span>
+          <span class="task-chip">Notes editor</span>
+          <span class="task-chip">Cross-reference</span>
+        </div>
+      </div>
+
+      <div class="milestone-item">
+        <div class="milestone-header">
+          <div class="milestone-title">🟣 M5 — Deploy & Polish</div>
+          <div class="milestone-week">Week 9–10</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill pf-purple" style="width:0%"></div></div>
+        <div class="milestone-tasks">
+          <span class="task-chip">Crime stats widgets</span>
+          <span class="task-chip">Cache tuning</span>
+          <span class="task-chip">Error boundaries</span>
+          <span class="task-chip">AWS ECS deploy</span>
+          <span class="task-chip">CloudWatch logging</span>
+          <span class="task-chip">Security hardening</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Onboarding flow mockup -->
+    <div style="margin-top:24px">
+      <div class="section-heading" style="font-size:11px">🔐 ONBOARDING FLOW (FIRST-TIME USER)</div>
+      <div class="onboard-flow">
+        <div class="onboard-logo">🕵️</div>
+        <div class="onboard-title">I AM DETECTIVE</div>
+        <div class="onboard-subtitle">Explore real criminal cases.<br>Browse. Investigate. Annotate.</div>
+        <button class="oauth-btn oauth-google">🔵 Continue with Google</button>
+        <button class="oauth-btn oauth-github">⬛ Continue with GitHub</button>
+        <div class="divider">— OR —</div>
+        <div style="color:var(--muted);font-size:10px">Demo mode: browse without account<br>(annotations disabled)</div>
+      </div>
+
+      <!-- NFR quick ref -->
+      <div class="section-heading" style="font-size:11px;margin-top:16px">⚡ NON-FUNCTIONAL TARGETS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px">
+          <div style="color:var(--muted);font-size:9px;margin-bottom:4px">FIRST CONTENTFUL PAINT</div>
+          <div style="color:var(--green);font-size:14px">&lt; 1.5s</div>
+          <div style="color:var(--muted);font-size:9px">SSR via Next.js</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px">
+          <div style="color:var(--muted);font-size:9px;margin-bottom:4px">API p95 LATENCY</div>
+          <div style="color:var(--accent);font-size:14px">&lt; 300ms</div>
+          <div style="color:var(--muted);font-size:9px">cached / &lt;2s cold</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px">
+          <div style="color:var(--muted);font-size:9px;margin-bottom:4px">CONCURRENT USERS</div>
+          <div style="color:var(--blue);font-size:14px">100+</div>
+          <div style="color:var(--muted);font-size:9px">MVP target</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px">
+          <div style="color:var(--muted);font-size:9px;margin-bottom:4px">UPTIME</div>
+          <div style="color:var(--green);font-size:14px">99.5%</div>
+          <div style="color:var(--muted);font-size:9px">ECS + RDS managed</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════
+     PAGE NAVIGATION
+══════════════════ -->
+<div class="page-nav">
+  <div class="page-indicator" id="page-indicator">PAGE 1 / 3</div>
+  <div style="display:flex;gap:8px">
+    <button onclick="prevPage()" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:4px;font-family:var(--font);font-size:11px;cursor:pointer">◀ PREV</button>
+    <button onclick="nextPage()" style="background:var(--accent);color:#000;border:none;padding:8px 14px;border-radius:4px;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:bold">NEXT ▶</button>
+  </div>
+</div>
+
+<script>
+  let currentPage = 0;
+  const totalPages = 3;
+  const pageNames = ['DASHBOARD', 'DOSSIER', 'ARCHITECTURE'];
+
+  function showPage(idx, navLink) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + idx).classList.add('active');
+    currentPage = idx;
+    document.getElementById('page-indicator').textContent = 'PAGE ' + (idx+1) + ' / ' + totalPages + ' — ' + pageNames[idx];
+    if (navLink) {
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      navLink.classList.add('active');
+    } else {
+      document.querySelectorAll('.nav-links a').forEach((a, i) => {
+        a.classList.toggle('active', i === idx);
+      });
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function nextPage() {
+    if (currentPage < totalPages - 1) showPage(currentPage + 1);
+  }
+
+  function prevPage() {
+    if (currentPage > 0) showPage(currentPage - 1);
+  }
+
+  function showTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') nextPage();
+    if (e.key === 'ArrowLeft') prevPage();
+  });
+</script>
+</body>
+</html>

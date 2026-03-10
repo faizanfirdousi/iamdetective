@@ -1,0 +1,28 @@
+@baseUrl = http://localhost:8080
+@apiUrl = {{baseUrl}}/api/v1
+
+### 1. Health Check
+GET {{baseUrl}}/health
+
+### 2. Search Cases (Generic)
+GET {{apiUrl}}/cases/search?q=tech
+
+### 3. Search Cases (Pagination & Limits)
+GET {{apiUrl}}/cases/search?q=tech&page=2&limit=5
+
+### 4. Search Cases (Filter by Source)
+GET {{apiUrl}}/cases/search?q=tech&source=courtlistener
+
+### 5. Search Cases (Filter by Jurisdiction)
+GET {{apiUrl}}/cases/search?q=tech&jurisdiction=california
+
+### 6. Get Specific Case
+# Replace REPLACE_WITH_CASE_ID with an actual ID from search results above (e.g. 5e182ba...)
+@caseId = REPLACE_WITH_CASE_ID
+GET {{apiUrl}}/cases/{{caseId}}
+
+### 7. Get Related Cases
+GET {{apiUrl}}/cases/{{caseId}}/related
+
+### 8. Get Related Cases with Custom Query
+GET {{apiUrl}}/cases/{{caseId}}/related?q=apple
