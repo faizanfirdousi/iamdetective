@@ -36,6 +36,8 @@ func main() {
 	}
 
 	clToken := os.Getenv("COURTLISTENER_API_TOKEN")
+	ikToken := os.Getenv("INDIANKANOON_API_TOKEN")
+	ecToken := os.Getenv("ECOURTS_API_TOKEN")
 
 	// 2. Initialize Database (Postgres)
 	db, err := sql.Open("postgres", dbURL)
@@ -59,9 +61,11 @@ func main() {
 	caseRepo := repository.NewCaseRepository(db)
 	redisService := services.NewRedisService(redisClient)
 	clService := services.NewCourtListenerService(clToken)
+	ikService := services.NewIndianKanoonService(ikToken)
+	ecService := services.NewECourtsService(ecToken)
 
 	// 5. Initialize Handlers
-	caseHandler := handlers.NewCaseHandler(caseRepo, redisService, clService)
+	caseHandler := handlers.NewCaseHandler(caseRepo, redisService, clService, ikService, ecService)
 
 	// 6. Setup Router
 	router := gin.Default()

@@ -29,8 +29,8 @@ export default function RootLayout({
             </a>
             <nav className="ml-auto flex items-center space-x-6 text-sm font-medium">
               <a href="/cases" className="transition-colors hover:text-amber-400">All Cases</a>
-              <a href="/cases" className="transition-colors text-zinc-500 hover:text-amber-400">Dossiers</a>
-              <a href="/cases" className="transition-colors text-zinc-500 hover:text-amber-400">Evidence</a>
+              <a href="/indian-cases" className="transition-colors text-zinc-500 hover:text-orange-400 flex items-center gap-1">🇮🇳 Indian Cases</a>
+              <a href="/ecourts" className="transition-colors text-zinc-500 hover:text-indigo-400 flex items-center gap-1">⚖️ eCourts</a>
             </nav>
           </div>
         </header>
